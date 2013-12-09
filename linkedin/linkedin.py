@@ -307,6 +307,24 @@ class LinkedInApplication(object):
             if not self.request_succeeded(response):
                 raise LinkedInError(response)
             return response
+            
+    def get_comments(self, post_id, selectors=None, params=None, headers=None):
+        url = '%s/%s/comments' % (ENDPOINTS.POSTS, str(post_id))
+        print url
+        if selectors:
+            url = '%s:(%s)' % (url, LinkedInSelector.parse(selectors))
+        try:
+            response = self.make_request('GET', url, params=params, headers=headers)
+            if response.content:
+                response = response.json()
+            else:
+                return None
+        except requests.ConnectionError as error:
+            raise LinkedInHTTPError(error.message)
+        else:
+            if not self.request_succeeded(response):
+                raise LinkedInError(response)
+            return response
 
     def join_group(self, group_id):
         url = '%s/~/group-memberships/%s' % (ENDPOINTS.PEOPLE, str(group_id))
